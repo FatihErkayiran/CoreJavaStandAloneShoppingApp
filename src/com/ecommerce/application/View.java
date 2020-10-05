@@ -2,6 +2,7 @@ package com.ecommerce.application;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +18,12 @@ public class View {
 	
 	public static void main(String[] args) {
 		
-		//Controller controller =new Controller();
+		Controller controller =new Controller();
 		int count=0;
 		int counter=1;
-		File file =new File("resources/"+ counter + ".data");
+		//File file =new File("resources/"+ counter + ".data");
 		List<Item>items=new ArrayList<>();
+		System.out.println("items " +items);
 		boolean state=true;
 	while(state) {
 		try {
@@ -45,18 +47,18 @@ public class View {
 	//                	System.out.println("Passwords do not match");
 	//                	case1=false;
 	//				     }
-	                try {
-	    				file.createNewFile();
-	    			} catch (IOException e) {
-	    				// TODO Auto-generated catch block
-	    				e.printStackTrace();
-	    			}
+//	                try {
+//	    				file.createNewFile();
+//	    			} catch (IOException e) {
+//	    				// TODO Auto-generated catch block
+//	    				e.printStackTrace();
+//	    			}
 	                
 				Customer customer=new Customer(userName, conPassword);
 			    
-				Controller.writeObjToFile(file, customer);
-	//			controller.createAccount(customer);
-				counter++;
+	//			Controller.writeObjToFile(file, customer);
+				controller.createAccount(customer);
+	//			counter++;
 				}
 			
 				if (choice==2) {
@@ -65,11 +67,11 @@ public class View {
 				String userName=scanner.nextLine();
 				System.out.println(" Password ");
 				String password=scanner.nextLine();
-				Customer cust=Controller.readObjFromFile(file);
+	//			Customer cust=Controller.readObjFromFile(file);
 				
-//			    Customer cust= controller.loginCustomer(userName, password);
-				 
-				 if (cust.getUserName().equals(userName) && cust.getPassword().equals(password)) {
+			    Customer cust= controller.loginCustomer(userName, password);
+				 System.out.println(cust);
+				 if (cust!=null) {
 						System.out.println(" Welcome " + cust.getUserName());
 						System.out.println("3.Buy An Item\n4.Replace An Item\n5.Exit");
 						int choiceAgain=scanner.nextInt();
@@ -93,16 +95,10 @@ public class View {
 							 items.add(shirt);
 						 }
 						 else if(itemChoice==4) {
-							 Integer nInteger=(int) ((Math.random())/12);
-							 System.out.println("Customer Name " + cust.getUserName() + " "+LocalDateTime.now()+
-									 "\nInvoice Number: " + nInteger);
-//							 System.out.println(items.size());
-//							 for (Item item : items) {
-//								System.out.println(item + "\n");
-//								
-//								
-//							}
-							
+							 LocalDate time=LocalDate.now();
+							 int invoiceNumber=(int) ((Math.random())*100);
+							 System.out.println("Customer Name: " + cust.getUserName() + "\nTime: "+ LocalDateTime.now()+
+									 "\nInvoice Number: " + invoiceNumber);
 							 
 							 for (int i = 0; i < items.size(); i++) {
 								 System.out.println(items.get(i) + "\n");
@@ -111,7 +107,7 @@ public class View {
 							}							 
 							 System.out.println("Total = " + count + "$");
 							 
-								 
+								 controller.saveTransactions(cust, invoiceNumber, time);
 							
 						//	 System.out.println("Total = " + count);
 							 
@@ -135,8 +131,11 @@ public class View {
 						
 						else if(choiceAgain==4) {
 							System.out.println("Please enter your invoice number");
-							Integer num=scanner.nextInt();
+							int num=scanner.nextInt();
 							scanner.nextLine();
+							System.out.println("Please enter today's date");
+							
+							
 							
 						}		
 						else if(choiceAgain==5) {
