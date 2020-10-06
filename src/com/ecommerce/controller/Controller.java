@@ -7,9 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.Period;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
 
 import com.ecommerce.connection.BetterConnectionManager;
 import com.ecommerce.model.Customer;
@@ -129,29 +128,64 @@ public void saveTransactions(Customer cust,int invoiceNumber,LocalDate time)  {
 	
 }
 	
-	public void checkInvoice(Customer cust,int invoiceNumber,LocalDate returnTime) {
+	public boolean checkInvoice(Customer cust,int invoiceNumber,String returnTime) {
 		try {
-			PreparedStatement pStatement=connection.prepareStatement("select from transactions where user_name = ? and invoiceNumber = ? ");
+			PreparedStatement pStatement=connection.prepareStatement("select * from transactions where user_name = ? and invoiceNumber = ? ");
 			pStatement.setString(1, cust.getUserName());
 			pStatement.setInt(2, invoiceNumber);
 			
 			ResultSet rSet=pStatement.executeQuery();
 			Date timeDate=Date.valueOf("2020-9-1");
-			if (rSet.next()) {
-				String usrName=rSet.getString(3);
-				timeDate=rSet.getDate(2);
-				int number=rSet.getInt(1);
-			}
 			
+
+			DateTimeFormatter formatter =DateTimeFormatter.ofPattern("MM/d/yyyy");
+			LocalDate returnTime2=LocalDate.parse(returnTime,formatter);
 			LocalDate start =timeDate.toLocalDate();
-			LocalDate end = returnTime;
-			System.out.println(Period.between(start, end));
+			LocalDate end = returnTime2;
+			
+			
+			
+			if (rSet.next()) {
+				//String usrName=rSet.getString(3);
+				timeDate=rSet.getDate(2);
+			//	int number=rSet.getInt(1);
+				
+				if (Period.between(start, end).getDays() <= 15 && Period.between(start, end).getDays() > 0 ) {
+					return true;
+				}
+			}
+			else {
+				System.out.println("there is no such invoice number");
+				return false;
+			}
+	
+			System.out.println(Period.between(start, end).getDays());
+			
+			pStatement.close();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return false;
 	}
 	
-	
+	public void deleteTransactionAfterRefund(int invoiceNumber) {
+		
+		try {
+			PreparedStatement preparedStatement =connection.prepareStatement("delete from transactions where invoiceNumber = ?");
+		
+		    preparedStatement.setInt(1, invoiceNumber); 
+		    
+		    int number=preparedStatement.executeUpdate();
+		    System.out.println("deleted number of rows: " + number);
+		
+		     preparedStatement.close();
+		
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 }
 

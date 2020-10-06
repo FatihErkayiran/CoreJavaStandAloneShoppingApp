@@ -133,8 +133,16 @@ public class View {
 							System.out.println("Please enter your invoice number");
 							int num=scanner.nextInt();
 							scanner.nextLine();
-							System.out.println("Please enter today's date");
-							
+							System.out.println("Please enter today's date in the format of 'day/month/year'");
+							String dateString=scanner.nextLine();
+							boolean checkIfInvoiceEligible=controller.checkInvoice(cust, num, dateString);
+							if (checkIfInvoiceEligible) {
+								System.out.println("You can get your refund !!");
+								controller.deleteTransactionAfterRefund(num);
+							}
+							else {
+								System.out.println("I'm sorry more than 15 days has passed");
+							}
 							
 							
 						}		
